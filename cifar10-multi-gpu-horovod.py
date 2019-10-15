@@ -9,10 +9,14 @@ import tensorflow as tf
 # Change 1
 import horovod.tensorflow.keras as hvd
 
+from datetime import datetime
 import argparse
 import os
-import tensorflow.keras.backend as K
+import numpy as np
+import codecs
+import json
 
+import tensorflow.keras.backend as K
 from tensorflow import keras
 from tensorflow.keras.layers import Input, Dense, Flatten
 from tensorflow.keras.models import Model
@@ -115,7 +119,26 @@ def cifar10_model(input_shape):
 
 # In[6]:
 
+def save_history(path, history):
 
+    history_for_json = {}
+    # transform float values that aren't json-serializable
+    for key in list(history.history.keys()):
+        if type(history.history[key]) == np.ndarray:
+            history_for_json[key] == history.history[key].tolist()
+        elif type(history.history[key]) == list:
+           if  type(history.history[key][0]) == np.float32 or type(history.history[key][0]) == np.float64:
+               history_for_json[key] = list(map(float, history.history[key]))
+
+    with codecs.open(path, 'w', encoding='utf-8') as f:
+        json.dump(history_for_json, f, separators=(',', ':'), sort_keys=True, indent=4) 
+
+
+class CustomTensorBoardCallback(TensorBoard):
+    
+    def on_batch_end(self, batch, logs=None):
+        pass
+        
 #%%
 def main(args):
     # Hyper-parameters
@@ -128,7 +151,6 @@ def main(args):
 
     # Data directories and other options
     gpu_count = args.gpu_count
-    #model_dir = args.model_dir
     training_dir = args.training
     validation_dir = args.validation
     eval_dir = args.eval
@@ -170,6 +192,10 @@ def main(args):
     callbacks.append(tf.keras.callbacks.ReduceLROnPlateau(patience=10, verbose=1))
     if hvd.rank() == 0:
         callbacks.append(ModelCheckpoint(args.output_data_dir + '/checkpoint-{epoch}.h5'))
+        logdir = args.output_data_dir + '/' + 'tb-logs-{}'.format(datetime.now().strftime("%Y%m%d-%H%M%S"))
+        #print('\n\n\n\n'+logdir+'\n\n\n\n')
+        #callbacks.append(CustomTensorBoardCallback(logdir))
+        callbacks.append(keras.callbacks.TensorBoard(logdir))
     
     # Compile model
     model.compile(optimizer=opt,
@@ -177,15 +203,15 @@ def main(args):
                   metrics=['accuracy'])
 
     # remove me, testing new model approach
-    #from model_def import get_model
-    #model = get_model(lr, weight_decay, optimizer, momentum, 1, True, hvd)
+    from model_def import get_model
+    model = get_model(lr, weight_decay, optimizer, momentum, 1, True, hvd)
 
     # Train model
     history = model.fit(x=train_dataset[0], y=train_dataset[1],
                         steps_per_epoch= (NUM_TRAIN_IMAGES // batch_size)// size,
                         validation_data=val_dataset,
                         validation_steps= (NUM_VALID_IMAGES // batch_size)// size,
-                        epochs=epochs)
+                        epochs=epochs, callbacks=callbacks)
 
     # Evaluate model performance
     score = model.evaluate(eval_dataset[0],
@@ -195,16 +221,18 @@ def main(args):
     print('Test loss    :', score[0])
     print('Test accuracy:', score[1])
 
-    # Save model to model directory
-    #tf.contrib.saved_model.save_keras_model(model, args.model_output_dir)
-
+    if hvd.rank() == 0:
+        save_history(args.output_data_dir + "/hvd_history.p", history)
+        # Save model to model directory
+        #bug: https://github.com/horovod/horovod/issues/1437
+        #tf.contrib.saved_model.save_keras_model(model, args.model_output_dir)
 
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser()
 
     # Hyper-parameters
-    parser.add_argument('--epochs',        type=int,   default=30)
+    parser.add_argument('--epochs',        type=int,   default=15)
     parser.add_argument('--learning-rate', type=float, default=0.001)
     parser.add_argument('--batch-size',    type=int,   default=256)
     parser.add_argument('--weight-decay',  type=float, default=2e-4)
@@ -213,19 +241,13 @@ if __name__ == "__main__":
 
     # Data directories and other options
     parser.add_argument('--gpu-count',        type=int,   default=0)
-    parser.add_argument('--model_output_dir', type=str,   default='./models')
-    parser.add_argument('--training',      type=str,   default='data/train/train.tfrecords')
-    parser.add_argument('--validation',    type=str,   default='data/validation/validation.tfrecords')
-    parser.add_argument('--eval',          type=str,   default='data/eval/eval.tfrecords')
-    parser.add_argument('--output_data_dir',type=str,  default='./output_dir')
-    parser.add_argument('--tensorboard-dir',type=str,  default='./tensorboard-logs')
+    parser.add_argument('--training',         type=str,   default='../data/train/train.tfrecords')
+    parser.add_argument('--validation',       type=str,   default='../data/validation/validation.tfrecords')
+    parser.add_argument('--eval',             type=str,   default='../data/eval/eval.tfrecords')
+    #parser.add_argument('--model_dir',        type=str)
+    parser.add_argument('--model_output_dir', type=str,   default='./model_output_dir')  
+    parser.add_argument('--output_data_dir',  type=str,   default='./output_data_dir')
+    #parser.add_argument('--tensorboard_dir',  type=str,   default='./tensorboard-logs')
 
-    args = parser.parse_args(args=[])
+    args = parser.parse_args()
     main(args)
-
-
-# In[ ]:
-
-
-
-
