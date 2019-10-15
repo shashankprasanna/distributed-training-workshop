@@ -23,7 +23,8 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.utils import multi_gpu_model
 from tensorflow.keras.optimizers import Adam, SGD
 from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
-
+from model_def import get_model
+    
 HEIGHT = 32
 WIDTH  = 32
 DEPTH  = 3
@@ -98,25 +99,6 @@ def single_example_parser(serialized_example):
     return image, label
 
 
-# In[5]:
-
-
-def cifar10_model(input_shape):
-
-    input_tensor = Input(shape=input_shape)
-    base_model = keras.applications.resnet50.ResNet50(include_top=False,
-                                                      weights='imagenet',
-                                                      input_tensor=input_tensor,
-                                                      input_shape=input_shape,
-                                                      classes=None)
-
-    x = base_model.output
-    x = Flatten()(x)
-    predictions = Dense(10, activation='softmax')(x)
-    mdl = Model(inputs=base_model.input, outputs=predictions)
-    return mdl
-
-
 # In[6]:
 
 def save_history(path, history):
@@ -134,11 +116,6 @@ def save_history(path, history):
         json.dump(history_for_json, f, separators=(',', ':'), sort_keys=True, indent=4) 
 
 
-class CustomTensorBoardCallback(TensorBoard):
-    
-    def on_batch_end(self, batch, logs=None):
-        pass
-        
 #%%
 def main(args):
     # Hyper-parameters
@@ -170,19 +147,9 @@ def main(args):
     eval_dataset = make_batch(eval_dir, batch_size)
 
     input_shape = (HEIGHT, WIDTH, DEPTH)
-    model = cifar10_model(input_shape)
-
-    # Change 4 - update learning rate
-
-    if optimizer.lower() == 'sgd':
-        opt = SGD(lr=lr * size, decay=weight_decay, momentum=momentum)
-    elif optimizer.lower() == 'rmsprop':
-        opt = RMSprop(lr=lr * size, decay=weight_decay)
-    else:
-        opt = Adam(lr=lr * size, decay=weight_decay)
     
+    # Change 4 - update learning rate
     # Change 5 - update training code
-    opt = hvd.DistributedOptimizer(opt)
     
     # Change 6 - update callbacks - sync initial state, checkpoint only on 1st worker
     callbacks = []
@@ -192,18 +159,9 @@ def main(args):
     callbacks.append(tf.keras.callbacks.ReduceLROnPlateau(patience=10, verbose=1))
     if hvd.rank() == 0:
         callbacks.append(ModelCheckpoint(args.output_data_dir + '/checkpoint-{epoch}.h5'))
-        logdir = args.output_data_dir + '/' + 'tb-logs-{}'.format(datetime.now().strftime("%Y%m%d-%H%M%S"))
-        #print('\n\n\n\n'+logdir+'\n\n\n\n')
-        #callbacks.append(CustomTensorBoardCallback(logdir))
-        callbacks.append(keras.callbacks.TensorBoard(logdir))
+        logdir = args.tensorboard_dir + '/' + datetime.now().strftime("%Y%m%d-%H%M%S")
+        callbacks.append(keras.callbacks.TensorBoard(log_dir=logdir, profile_batch=0))
     
-    # Compile model
-    model.compile(optimizer=opt,
-                  loss='categorical_crossentropy',
-                  metrics=['accuracy'])
-
-    # remove me, testing new model approach
-    from model_def import get_model
     model = get_model(lr, weight_decay, optimizer, momentum, 1, True, hvd)
 
     # Train model
@@ -247,7 +205,7 @@ if __name__ == "__main__":
     #parser.add_argument('--model_dir',        type=str)
     parser.add_argument('--model_output_dir', type=str,   default='./model_output_dir')  
     parser.add_argument('--output_data_dir',  type=str,   default='./output_data_dir')
-    #parser.add_argument('--tensorboard_dir',  type=str,   default='./tensorboard-logs')
+    parser.add_argument('--tensorboard_dir',  type=str,   default='./tensorboard-logs')
 
     args = parser.parse_args()
     main(args)
