@@ -44,17 +44,6 @@ def get_model(learning_rate, weight_decay, optimizer, momentum):
     model.add(Dropout(0.5))
     model.add(Dense(NUM_CLASSES))
     model.add(Activation('softmax'))
-
-    if optimizer.lower() == 'sgd':
-        opt = SGD(lr=learning_rate, decay=weight_decay, momentum=momentum)
-    elif optimizer.lower() == 'rmsprop':
-        opt = RMSprop(lr=learning_rate, decay=weight_decay)
-    else:
-        opt = Adam(lr=learning_rate, decay=weight_decay)
-
-    model.compile(loss='categorical_crossentropy',
-                  optimizer=opt,
-                  metrics=['accuracy'])
     
     return model
 

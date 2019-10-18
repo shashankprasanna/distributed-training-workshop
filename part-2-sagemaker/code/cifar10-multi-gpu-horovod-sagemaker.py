@@ -1,12 +1,5 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import tensorflow as tf
 
-# Change 1
 import horovod.tensorflow.keras as hvd
 
 from datetime import datetime
@@ -33,10 +26,6 @@ NUM_TRAIN_IMAGES = 40000
 NUM_VALID_IMAGES = 10000
 NUM_TEST_IMAGES  = 10000
 
-
-# In[2]:
-
-
 def train_preprocess_fn(image):
 
     # Resize the image to add four extra pixels on each side.
@@ -49,9 +38,6 @@ def train_preprocess_fn(image):
     image = tf.image.random_flip_left_right(image)
 
     return image
-
-
-# In[3]:
 
 
 def make_batch(filenames, batch_size):
@@ -68,9 +54,6 @@ def make_batch(filenames, batch_size):
 
     image_batch, label_batch = iterator.get_next()
     return image_batch, label_batch
-
-
-# In[4]:
 
 
 def single_example_parser(serialized_example):
@@ -98,9 +81,6 @@ def single_example_parser(serialized_example):
     
     return image, label
 
-
-# In[6]:
-
 def save_history(path, history):
 
     history_for_json = {}
@@ -116,7 +96,6 @@ def save_history(path, history):
         json.dump(history_for_json, f, separators=(',', ':'), sort_keys=True, indent=4) 
 
 
-#%%
 def main(args):
     # Hyper-parameters
     epochs = args.epochs
