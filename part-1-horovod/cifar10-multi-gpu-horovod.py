@@ -3,7 +3,6 @@
 
 # In[1]:
 
-
 import tensorflow as tf
 
 # Change 1
@@ -142,6 +141,10 @@ def main(args):
     config.gpu_options.visible_device_list = str(hvd.local_rank())
     K.set_session(tf.Session(config=config))
     
+    train_dataset = make_batch(training_dir+'/train.tfrecords',  batch_size)
+    val_dataset = make_batch(validation_dir+'/validation.tfrecords', batch_size)
+    eval_dataset = make_batch(eval_dir+'/eval.tfrecords', batch_size)
+    
     train_dataset = make_batch(training_dir,  batch_size)
     val_dataset = make_batch(validation_dir, batch_size)
     eval_dataset = make_batch(eval_dir, batch_size)
@@ -162,7 +165,7 @@ def main(args):
         logdir = args.tensorboard_dir + '/' + datetime.now().strftime("%Y%m%d-%H%M%S")
         callbacks.append(keras.callbacks.TensorBoard(log_dir=logdir, profile_batch=0))
     
-    model = get_model(lr, weight_decay, optimizer, momentum, 1, True, hvd)
+    model = get_model(lr, weight_decay, optimizer, momentum, hvd)
 
     # Train model
     history = model.fit(x=train_dataset[0], y=train_dataset[1],
@@ -199,9 +202,9 @@ if __name__ == "__main__":
 
     # Data directories and other options
     parser.add_argument('--gpu-count',        type=int,   default=0)
-    parser.add_argument('--training',         type=str,   default='../data/train/train.tfrecords')
-    parser.add_argument('--validation',       type=str,   default='../data/validation/validation.tfrecords')
-    parser.add_argument('--eval',             type=str,   default='../data/eval/eval.tfrecords')
+    parser.add_argument('--training',         type=str,   default='../data/train')
+    parser.add_argument('--validation',       type=str,   default='../data/validation')
+    parser.add_argument('--eval',             type=str,   default='../data/eval')
     #parser.add_argument('--model_dir',        type=str)
     parser.add_argument('--model_output_dir', type=str,   default='./model_output_dir')  
     parser.add_argument('--output_data_dir',  type=str,   default='./output_data_dir')

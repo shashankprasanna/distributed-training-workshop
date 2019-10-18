@@ -8,7 +8,7 @@ WIDTH = 32
 DEPTH = 3
 NUM_CLASSES = 10
 
-def get_model(learning_rate, weight_decay, optimizer, momentum):
+def get_model(learning_rate, weight_decay, optimizer, momentum, size, mpi=False, hvd=False):
 
     model = Sequential()
     model.add(Conv2D(32, (3, 3), padding='same', input_shape=(HEIGHT, WIDTH, DEPTH)))
@@ -45,12 +45,18 @@ def get_model(learning_rate, weight_decay, optimizer, momentum):
     model.add(Dense(NUM_CLASSES))
     model.add(Activation('softmax'))
 
+    if mpi:
+        size = hvd.size()
+
     if optimizer.lower() == 'sgd':
-        opt = SGD(lr=learning_rate, decay=weight_decay, momentum=momentum)
+        opt = SGD(lr=learning_rate * size, decay=weight_decay, momentum=momentum)
     elif optimizer.lower() == 'rmsprop':
-        opt = RMSprop(lr=learning_rate, decay=weight_decay)
+        opt = RMSprop(lr=learning_rate * size, decay=weight_decay)
     else:
-        opt = Adam(lr=learning_rate, decay=weight_decay)
+        opt = Adam(lr=learning_rate * size, decay=weight_decay)
+
+    if mpi:
+        opt = hvd.DistributedOptimizer(opt)
 
     model.compile(loss='categorical_crossentropy',
                   optimizer=opt,
