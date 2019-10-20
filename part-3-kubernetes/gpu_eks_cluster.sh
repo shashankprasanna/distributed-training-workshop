@@ -1,8 +1,8 @@
 eksctl create cluster \
 	--name tfworld19-k8s-cluster \
-	--version 1.13 \
+	--version 1.14 \
 	--region us-west-2 \
-	--nodegroup-name gpu-nodes \
+	--nodegroup-name cpu-nodes \
 	--node-type p3.2xlarge \
 	--nodes 2 \
 	--timeout=40m \

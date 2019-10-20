@@ -177,16 +177,16 @@ if __name__ == "__main__":
     parser.add_argument('--optimizer',     type=str,   default='adam')
 
     # Data directories and other options
-    parser.add_argument('--gpu-count',        type=int,   default=os.environ['SM_NUM_GPUS'])
-    parser.add_argument('--train',            type=str,   default=os.environ['SM_CHANNEL_TRAIN'])
-    parser.add_argument('--validation',       type=str,   default=os.environ['SM_CHANNEL_VALIDATION'])
-    parser.add_argument('--eval',             type=str,   default=os.environ['SM_CHANNEL_EVAL'])
+    parser.add_argument('--gpu-count',        type=int,   default=0)
+    parser.add_argument('--train',            type=str)
+    parser.add_argument('--validation',       type=str)
+    parser.add_argument('--eval',             type=str)
     
     # SageMaker parameters
     parser.add_argument('--model_dir',        type=str)
-    parser.add_argument('--model_output_dir', type=str,   default=os.environ['SM_MODEL_DIR'])
-    parser.add_argument('--output_data_dir',  type=str,   default=os.environ['SM_OUTPUT_DATA_DIR'])
-    parser.add_argument('--tensorboard_dir',  type=str,   default=os.environ['SM_OUTPUT_DATA_DIR'])
+    parser.add_argument('--model_output_dir', type=str)
+    parser.add_argument('--output_data_dir',  type=str)
+    parser.add_argument('--tensorboard_dir',  type=str)
     
     args = parser.parse_args()
     main(args)
