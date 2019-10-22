@@ -19,12 +19,20 @@ from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
 from model_def import get_model
     
 HEIGHT = 32
-WIDTH  = 32
 DEPTH  = 3
 NUM_CLASSES = 10
 NUM_TRAIN_IMAGES = 40000
 NUM_VALID_IMAGES = 10000
 NUM_TEST_IMAGES  = 10000
+
+class Sync2S3(tf.keras.callbacks.Callback):
+    def __init__(self, logdir, s3logdir):
+        super(Sync2S3, self).__init__()
+        self.logdir = logdir
+        self.s3logdir = s3logdir
+    
+    def on_epoch_end(self, batch, logs={}):
+        os.system('aws s3 sync '+self.logdir+' '+self.s3logdir+'/tb_logs'+' >/dev/null 2>&1')
 
 def train_preprocess_fn(image):
 
@@ -140,6 +148,7 @@ def main(args):
         callbacks.append(ModelCheckpoint(args.output_data_dir + '/checkpoint-{epoch}.h5'))
         logdir = args.tensorboard_dir + '/' + datetime.now().strftime("%Y%m%d-%H%M%S")
         callbacks.append(keras.callbacks.TensorBoard(log_dir=logdir, profile_batch=0))
+        callbacks.append(Sync2S3(logdir=logdir, s3logdir=model_dir))
     
     model = get_model(lr, weight_decay, optimizer, momentum, 1, True, hvd)
 
