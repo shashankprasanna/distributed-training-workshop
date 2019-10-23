@@ -5,12 +5,12 @@ metadata:
 spec:
   containers:
   - name: app
-    image: centos
+    image: 453691756499.dkr.ecr.us-west-2.amazonaws.com/tfworld2019:latest
     command: ["/bin/sh"]
-    args: ["-c", "while true; do ls /data/cifar10-dataset; sleep 5; done"]
+    args: ["-c", "while true; do ls /training-data/; sleep 5; done"]
     volumeMounts:
     - name: persistent-storage
-      mountPath: /data
+      mountPath: /training-data
   volumes:
   - name: persistent-storage
     persistentVolumeClaim:

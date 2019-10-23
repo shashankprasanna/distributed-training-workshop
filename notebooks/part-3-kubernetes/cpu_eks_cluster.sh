@@ -1,10 +1,11 @@
 eksctl create cluster \
-    --name aws-tf-cluster-az2a \
+    --name aws-tf-cluster-cpu \
     --version 1.14 \
     --region us-west-2 \
     --nodegroup-name cpu-nodes \
     --node-type c5.xlarge \
     --nodes 2 \
+    --node-volume-size 50 \
     --node-zones us-west-2a \
     --timeout=40m \
     --ssh-access \

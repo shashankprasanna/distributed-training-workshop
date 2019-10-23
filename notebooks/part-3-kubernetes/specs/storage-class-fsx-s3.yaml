@@ -4,8 +4,8 @@ metadata:
   name: fsx-sc
 provisioner: fsx.csi.aws.com
 parameters:
-  subnetId: subnet-04407e1063c6936a1
-  securityGroupIds: sg-0e8a98c7b588c0953
+  subnetId: subnet-04357fd9a0884c9d6
+  securityGroupIds: sg-0b1a63bb2b3fdf1c7
   s3ImportPath: s3://tfworld19-dist-training-workshop/
   s3ExportPath: s3://tfworld19-dist-training-workshop/
   apiVersion: v1

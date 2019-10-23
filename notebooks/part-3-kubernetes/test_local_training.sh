@@ -1,6 +1,7 @@
-python cifar10-multi-gpu-horovod.py --batch-size 256 \
+python cifar10-multi-gpu-horovod.py  \
 --epochs 30 \
 --learning-rate 0.01 \
+--batch-size 256
 --momentum 0.9 \
 --optimizer sgd \
 --weight-decay 0.0002 \
