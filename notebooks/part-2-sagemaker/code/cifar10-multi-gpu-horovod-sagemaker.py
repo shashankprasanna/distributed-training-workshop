@@ -1,5 +1,4 @@
 import tensorflow as tf
-
 import horovod.tensorflow.keras as hvd
 
 from datetime import datetime
@@ -8,6 +7,7 @@ import os
 import numpy as np
 import codecs
 import json
+import boto3
 
 import tensorflow.keras.backend as K
 from tensorflow import keras
@@ -17,8 +17,9 @@ from tensorflow.keras.utils import multi_gpu_model
 from tensorflow.keras.optimizers import Adam, SGD
 from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
 from model_def import get_model
-    
+
 HEIGHT = 32
+WIDTH = 32
 DEPTH  = 3
 NUM_CLASSES = 10
 NUM_TRAIN_IMAGES = 40000
@@ -32,7 +33,7 @@ class Sync2S3(tf.keras.callbacks.Callback):
         self.s3logdir = s3logdir
     
     def on_epoch_end(self, batch, logs={}):
-        os.system('aws s3 sync '+self.logdir+' '+self.s3logdir+'/tb_logs'+' >/dev/null 2>&1')
+        os.system('aws s3 sync '+self.logdir+' '+self.s3logdir +' >/dev/null 2>&1')
 
 def train_preprocess_fn(image):
 
@@ -113,8 +114,9 @@ def main(args):
     weight_decay = args.weight_decay
     optimizer = args.optimizer
 
-    # Data directories and other options
+    # SageMaker options
     gpu_count = args.gpu_count
+    model_dir = args.model_dir
     training_dir = args.train
     validation_dir = args.validation
     eval_dir = args.eval
@@ -146,11 +148,11 @@ def main(args):
     callbacks.append(tf.keras.callbacks.ReduceLROnPlateau(patience=10, verbose=1))
     if hvd.rank() == 0:
         callbacks.append(ModelCheckpoint(args.output_data_dir + '/checkpoint-{epoch}.h5'))
-        logdir = args.tensorboard_dir + '/' + datetime.now().strftime("%Y%m%d-%H%M%S")
-        callbacks.append(keras.callbacks.TensorBoard(log_dir=logdir, profile_batch=0))
+        logdir = args.output_data_dir + '/' + datetime.now().strftime("%Y%m%d-%H%M%S")
+        callbacks.append(TensorBoard(log_dir=logdir, profile_batch=0))
         callbacks.append(Sync2S3(logdir=logdir, s3logdir=model_dir))
     
-    model = get_model(lr, weight_decay, optimizer, momentum, 1, True, hvd)
+    model = get_model(lr, weight_decay, optimizer, momentum, hvd)
 
     # Train model
     history = model.fit(x=train_dataset[0], y=train_dataset[1],
@@ -170,8 +172,8 @@ def main(args):
     if hvd.rank() == 0:
         save_history(args.output_data_dir + "/hvd_history.p", history)
         # Save model to model directory
-        #bug: https://github.com/horovod/horovod/issues/1437
-        #tf.contrib.saved_model.save_keras_model(model, args.model_output_dir)
+        # bug: https://github.com/horovod/horovod/issues/1437
+        # tf.contrib.saved_model.save_keras_model(model, args.model_output_dir)
 
 if __name__ == "__main__":
     
@@ -185,17 +187,17 @@ if __name__ == "__main__":
     parser.add_argument('--momentum',      type=float, default='0.9')
     parser.add_argument('--optimizer',     type=str,   default='adam')
 
+    # SageMaker parameters
+    parser.add_argument('--model_dir',        type=str)
+    parser.add_argument('--model_output_dir', type=str,   default=os.environ['SM_MODEL_DIR'])
+    parser.add_argument('--output_data_dir',  type=str,   default=os.environ['SM_OUTPUT_DATA_DIR'])
+    
     # Data directories and other options
     parser.add_argument('--gpu-count',        type=int,   default=os.environ['SM_NUM_GPUS'])
     parser.add_argument('--train',            type=str,   default=os.environ['SM_CHANNEL_TRAIN'])
     parser.add_argument('--validation',       type=str,   default=os.environ['SM_CHANNEL_VALIDATION'])
     parser.add_argument('--eval',             type=str,   default=os.environ['SM_CHANNEL_EVAL'])
     
-    # SageMaker parameters
-    parser.add_argument('--model_dir',        type=str)
-    parser.add_argument('--model_output_dir', type=str,   default=os.environ['SM_MODEL_DIR'])
-    parser.add_argument('--output_data_dir',  type=str,   default=os.environ['SM_OUTPUT_DATA_DIR'])
-    parser.add_argument('--tensorboard_dir',  type=str,   default=os.environ['SM_OUTPUT_DATA_DIR'])
-    
     args = parser.parse_args()
+
     main(args)

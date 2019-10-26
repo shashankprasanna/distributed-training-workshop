@@ -1,5 +1,5 @@
 eksctl create cluster \
-    --name aws-tf-cluster-gpu-1 \
+    --name aws-tf-cluster \
     --version 1.14 \
     --region us-west-2 \
     --nodegroup-name gpu-nodes \
