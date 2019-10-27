@@ -1,3 +1,32 @@
-baseURL = "http://example.org/"
+baseURL = "https://distributed-training-workshop.go-aws.com"
 languageCode = "en-us"
-title = "My New Hugo Site"
+defaultContentLanguage = "en"
+title = "Distributed training with Amazon SageMaker / Amazon EKS  Workshop"
+theme = "learn"
+uglyurls = true
+#googleAnalytics = "UA-129511631-1"
+sectionPagesMenu = "main"
+pygmentsCodeFences = true
+
+[blackfriday]
+hrefTargetBlank = true
+
+[params]
+themeVariant = "mine"
+showVisitedLinks = false
+author = "Shashank Prasanna"
+description = "Distributed training workshop with Amazon SageMaker and Amazon EKS"
+disableSearch = false
+disableAssetsBusting = false
+disableLanguageSwitchingButton = true
+disableShortcutsTitle=true
+
+[[menu.shortcuts]]
+name = "<i class='fab fa-twitter fa-lg'></i> @shshnkp"
+identifier = "tw"
+url = "https://twitter.com/shshnkp"
+weight = 1
+
+[outputs]
+home = [ "HTML", "AMP", "RSS", "JSON"]
+page = [ "HTML", "AMP"]
