@@ -9,3 +9,11 @@ chapter = true
 # Some Chapter title
 
 Lorem Ipsum.
+
+Lorem Ipsum.
+
+
+```
+def function():
+     print('there')
+```

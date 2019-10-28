@@ -18,8 +18,13 @@ author = "Shashank Prasanna"
 description = "Distributed training workshop with Amazon SageMaker and Amazon EKS"
 disableSearch = false
 disableAssetsBusting = false
-disableLanguageSwitchingButton = true
-disableShortcutsTitle=true
+
+disableInlineCopyToClipBoard = false
+disableShortcutsTitle = false
+disableLanguageSwitchingButton = false
+disableBreadcrumb = true
+disableNextPrev = true
+ordersectionsby = "weight"
 
 [[menu.shortcuts]]
 name = "<i class='fab fa-twitter fa-lg'></i> @shshnkp"
