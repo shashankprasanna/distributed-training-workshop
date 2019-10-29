@@ -4,7 +4,7 @@ defaultContentLanguage = "en"
 title = "Distributed training with Amazon SageMaker / Amazon EKS  Workshop"
 theme = "learn"
 uglyurls = true
-#googleAnalytics = "UA-129511631-1"
+googleAnalytics = "UA-151135045-1"
 sectionPagesMenu = "main"
 pygmentsCodeFences = true
 
