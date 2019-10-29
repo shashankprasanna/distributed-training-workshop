@@ -7,4 +7,5 @@ chapter = true
 +++
 
 # Getting Started
-In this section, we'll setup up our development environment. We'll be using an Amazon SageMaker notebook instance which is a fully managed compute instance running the Jupyter Notebook server.
+In this section, we'll setup up our development environment.
+We'll be using an Amazon SageMaker notebook instance which is a fully managed compute instance running the Jupyter Notebook server.

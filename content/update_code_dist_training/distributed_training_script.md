@@ -6,6 +6,11 @@ weight: 4
 
 ## Exercise 1: Convert training script to use horovod
 
+<br>In this section you'll update the  training script with horovod API for run distributed training.
+
+Open `cifar10-distributed.ipynb` and run through the cells. The following notebook is located at: <br>
+***distributed-training-workshop > notebooks > part-1-horovod***
+
 ![singe_instance](/images/convert_script/distributed_script.png)
 
 {{% notice warning %}}
