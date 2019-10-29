@@ -8,7 +8,5 @@ eksctl create cluster \
     --node-volume-size 50 \
     --node-zones us-west-2a \
     --timeout=40m \
-    --ssh-access \
-    --ssh-public-key=aws-tf-workshop \
     --zones=us-west-2a,us-west-2b,us-west-2c \
     --auto-kubeconfig

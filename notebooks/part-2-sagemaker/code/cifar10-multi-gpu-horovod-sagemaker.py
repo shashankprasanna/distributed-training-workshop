@@ -33,7 +33,8 @@ class Sync2S3(tf.keras.callbacks.Callback):
         self.s3logdir = s3logdir
     
     def on_epoch_end(self, batch, logs={}):
-        os.system('aws s3 sync '+self.logdir+' '+self.s3logdir +' >/dev/null 2>&1')
+        os.system('aws s3 sync '+self.logdir+' '+self.s3logdir)
+        # ' >/dev/null 2>&1'
 
 def train_preprocess_fn(image):
 

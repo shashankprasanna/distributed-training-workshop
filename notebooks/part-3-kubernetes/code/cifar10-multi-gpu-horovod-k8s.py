@@ -107,6 +107,7 @@ def main(args):
 
     # Data directories and other options
     gpu_count = args.gpu_count
+    model_dir = args.model_dir
     training_dir = args.train
     validation_dir = args.validation
     eval_dir = args.eval
@@ -138,10 +139,10 @@ def main(args):
     callbacks.append(tf.keras.callbacks.ReduceLROnPlateau(patience=10, verbose=1))
     if hvd.rank() == 0:
         callbacks.append(ModelCheckpoint(args.output_data_dir + '/checkpoint-{epoch}.h5'))
-        logdir = args.tensorboard_dir + '/' + datetime.now().strftime("%Y%m%d-%H%M%S")
-        callbacks.append(keras.callbacks.TensorBoard(log_dir=logdir, profile_batch=0))
+        logdir = args.output_data_dir + '/' + datetime.now().strftime("%Y%m%d-%H%M%S")
+        callbacks.append(TensorBoard(log_dir=logdir, profile_batch=0))
     
-    model = get_model(lr, weight_decay, optimizer, momentum, 1, True, hvd)
+    model = get_model(lr, weight_decay, optimizer, momentum, hvd)
 
     # Train model
     history = model.fit(x=train_dataset[0], y=train_dataset[1],
@@ -182,7 +183,6 @@ if __name__ == "__main__":
     parser.add_argument('--validation',       type=str)
     parser.add_argument('--eval',             type=str)
     
-    # SageMaker parameters
     parser.add_argument('--model_dir',        type=str)
     parser.add_argument('--model_output_dir', type=str)
     parser.add_argument('--output_data_dir',  type=str)
