@@ -11,6 +11,7 @@
     {{ .Hugo.Generator }}
     {{ partial "meta.html" . }}
     {{ partial "favicon.html" . }}
+    {{ partials "google/analytics" . }}
     <title>{{ .Title }} :: {{ .Site.Title }}</title>
 
     {{ $assetBusting := not .Site.Params.disableAssetsBusting }}

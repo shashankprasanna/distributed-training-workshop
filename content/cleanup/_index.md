@@ -1,11 +1,11 @@
 ---
 title: "Cleanup"
 date: 2019-10-27T15:25:09-07:00
-chapter = true
 weight: 6
 ---
 
 In this section, we'll walkthrough steps to clean up resources.
+
 
 ## Amazon EKS resources
 
@@ -30,6 +30,8 @@ aws ec2 delete-security-group --group-id ${SECURITY_GROUP_ID}
 
 #### Delete policies attached to the instance role
 These policies were automatically added to the node IAM roles, but we'll need to manually remove them.
+
+* Copy the role associated with the worker instances
 ```
 echo $INSTANCE_ROLE_NAME
 ```
@@ -57,4 +59,3 @@ It's always good idea to ensure that:
 
 * Stop or terminate EC2 instances that's not currently in use, by navigating to the EC2 console
 * Delete data stored on Amazon S3 that you don't need
-

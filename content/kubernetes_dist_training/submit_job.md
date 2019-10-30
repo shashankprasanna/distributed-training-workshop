@@ -4,10 +4,20 @@ date: 2019-10-28T17:14:05-07:00
 weight: 8
 ---
 
+Confirm that you are in the right directory
+```
+cd ~/SageMaker/distributed-training-workshop/notebooks/part-3-kubernetes/
+```
+
 To submit a job run:
 ```
 kubectl apply -f specs/eks_tf_training_job-cpu.yaml
 ```
+{{% notice tip %}}
+For GPU jobs use this instead: `eks_tf_training_job-gpu.yaml`
+{{% /notice %}}
+
+
 You should see an output something like this:
 ```
 mpijob.kubeflow.org/eks-tf-distributed-training created
@@ -22,10 +32,10 @@ eks-tf-distributed-training-worker-0         1/1     Running   0          66s
 eks-tf-distributed-training-worker-1         1/1     Running   0          66s
 ```
 
-To observer training logs, run `kubectl logs <pod_name>`. Select the launcher pod from the list:
+To observer training logs, run `kubectl logs <pod_name>`. Select the launcher pod from the list. You can use tab complete or copy the name of the pod from the output of `kubectl get pods`
 
 ```
-kubectl logs eks-tf-distributed-training-launcher-6lgzg
+kubectl logs eks-tf-distributed-training-launcher-<TAB>
 ```
 
 output:

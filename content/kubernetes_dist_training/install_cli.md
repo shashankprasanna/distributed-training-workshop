@@ -4,6 +4,12 @@ date: 2019-10-28T15:02:28-07:00
 weight: 2
 ---
 
+Navigate to the following directory for part 3 of the workshop
+```
+cd ~/SageMaker/distributed-training-workshop/notebooks/part-3-kubernetes/
+```
+
+
 #### Install `eksctl`
 
 To get started we'll fist install the eksctl CLI tool. [eksctl](https://eksctl.io) simplifies the process of creating EKS clusters.

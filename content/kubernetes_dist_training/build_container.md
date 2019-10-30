@@ -10,23 +10,29 @@ In our Dockerfile we start with an AWS Deep Learning TensorFlow container and co
 
 ```
 cd ~/SageMaker/distributed-training-workshop/notebooks/part-3-kubernetes/
-cat Dockerfile.gpu
+cat Dockerfile.cpu
 ```
-Dockerfile.gpu Output:
+`Dockerfile.cpu` Output:
 ```
-FROM 763104351884.dkr.ecr.us-west-2.amazonaws.com/tensorflow-training:1.14.0-gpu-py36-cu100-ubuntu16.04
+FROM 763104351884.dkr.ecr.us-west-2.amazonaws.com/tensorflow-training:1.14.0-cpu-py36-ubuntu16.04
 COPY code /opt/training/
 WORKDIR /opt/training
 ```
 
-#### Create a new Elastic Container Registry repository
+{{% notice tip %}}
+Replace with `Dockerfile.gpu` if you're going to be running training on a GPU cluster.
+{{% /notice %}}
+
+#### Build and push a custom Docker container
 
 * Navigate to [ECR and create a new repository](https://console.aws.amazon.com/ecr/home)
 * Click create repository
 * Provide a repository name
-* Click create again
-* Click **View push commands**
-* Keep this open, we'll come back to this soon
+* Click create
+
+{{% notice tip %}}
+By clicking on **View push commands** button below, you can get access to docker build and push commands, so you don't have to remember them.
+{{% /notice %}}
 ![create repo](/images/eks/create_repo.png)
 ![push commands](/images/eks/push_commands.png)
 #### Create a new Elastic Container Registry repository
@@ -35,13 +41,18 @@ WORKDIR /opt/training
 ```
 $(aws ecr get-login --no-include-email --region us-west-2 --registry-ids 763104351884)
 ```
-* Open the push instructions and run **Step 2**
- * Make sure to add `-f Dockerfile.cpu` or `-f Dockerfile.gpu` before the dot to specify CPU or GPU container:
-  * `docker build -t tfworld2019 -f Dockerfile.cpu .`
-  * `docker build -t tfworld2019 -f Dockerfile.gpu .`
-* Run **Step 3**
-* After that run **Step 1** and **Step 4**
+* Run `docker build` command in **Step 2** from the Docker push commands menu. Make sure to update it with the correct Docker file name for CPU or GPU:
+  * For CPU container: `docker build -t <your_docker_repo_name> -f Dockerfile.cpu .`
+  * For GPU container: `docker build -t <your_docker_repo_name> -f Dockerfile.gpu .`
+* Run the `docker tag` command in **Step 3** from the Docker push commands menu
+
+* Log in to your docker registry
+ * `$(aws ecr get-login --no-include-email --region us-west-2)`
+
+* Run `docker push` command in **Step 4** from the Docker push commands menu
 
 {{% notice tip %}}
-The reason for the non-linear order is that, you need to first log into the AWS Deep Learning container registry in order to build our container. Once the container is built, you then need to log into your own registry, so that you can push the container (Step 4)
+What happened?
+(1) You first logged into the AWS Deep Learning container registry in order to pull the deep learning container (2) You then built your container. (3) After the container is built, you added the appropriate tag needed to push it to ECR. (4) Then you login to your own registry. (4) Then you push the container to your registry
+
 {{% /notice %}}

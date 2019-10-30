@@ -9,6 +9,7 @@ Navigate to ***distributed-training-workshop > notebooks > part-3-sagemaker***
 The `cpu_eks_cluster.sh` and `gpu_eks_cluster.sh` files include the necessary options to lauch a CPU or GPU cluster. Take a look at the options by running the following script to launch an EKS clusters
 
 ```bash
+cd ~/SageMaker/distributed-training-workshop/notebooks/part-3-kubernetes/
 cat cpu_eks_cluster.sh
 ```
 You should see the following output
@@ -28,7 +29,11 @@ eksctl create cluster \
     --auto-kubeconfig
 ```
 
-Update the `nodes` argument to increase the number of nodes you want in the cluster. Now launch an EKS cluster:
+{{% notice tip %}}
+To launch a cluster with GPU use the script `gpu_eks_cluster.sh` instead. If you wish to launch a cluster with more than 2 nodes, update the `nodes` argument to number of nodes you want in the cluster.
+{{% /notice %}}
+
+ Now launch an EKS cluster:
 ```
 sh cpu_eks_cluster.sh
 ```

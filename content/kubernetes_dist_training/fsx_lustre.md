@@ -27,11 +27,18 @@ paste the subnet ID below
 export SUBNET_ID=<subnet_id>
 ```
 
-#### Create your security group for the FSx file system and add an ingress rule that opens up port 988 from the 192.168.0.0/16 CIDR range:
+#### Create your security group for the FSx file system
 ```
-SECURITY_GROUP_ID=$(aws ec2 create-security-group --group-name eks-fsx-security-group --vpc-id ${VPC_ID} --description "FSx for Lustre Security Group" --query "GroupId" --output text)
-export SECURITY_GROUP_ID=${SECURITY_GROUP_ID}
+export SECURITY_GROUP_ID=$(aws ec2 create-security-group --group-name eks-fsx-security-group --vpc-id ${VPC_ID} --description "FSx for Lustre Security Group" --query "GroupId" --output text)
+```
 
+{{% notice warning %}}
+**Stop:** Make sure that the security group was created before proceeding.
+Confirm by running `echo $SECURITY_GROUP_ID`. Don't proceed if this is empty.
+{{% /notice %}}
+
+#### Add an ingress rule that opens up port 988 from the 192.168.0.0/16 CIDR range
+```
 aws ec2 authorize-security-group-ingress --group-id ${SECURITY_GROUP_ID} --protocol tcp --port 988 --cidr 192.168.0.0/16
 ```
 
@@ -39,6 +46,7 @@ aws ec2 authorize-security-group-ingress --group-id ${SECURITY_GROUP_ID} --proto
 Running envsubst will populate SUBNET_ID, SECURITY_GROUP_ID, BUCKET_NAME
 ```
 cd ~/SageMaker/distributed-training-workshop/notebooks/part-3-kubernetes/
+
 envsubst < specs/storage-class-fsx-s3-template.yaml > specs/storage-class-fsx-s3.yaml
 ```
 
@@ -48,7 +56,7 @@ kubectl apply -f specs/storage-class-fsx-s3.yaml
 kubectl apply -f specs/claim-fsx-s3.yaml
 ```
 
-This will take several minutes. You can check the status by running:
+This will take several minutes. You can check the status by running the following command. Hit `Ctrl+C` if you don't want the terminal to be blocked. To manually check, run the command without `-w`
 
 ```
 kubectl get pvc fsx-claim -w
