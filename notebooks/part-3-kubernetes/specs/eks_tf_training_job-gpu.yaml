@@ -12,7 +12,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: eks-tf-dist-job
-        image: 453691756499.dkr.ecr.us-west-2.amazonaws.com/tfworld2019:latest
+        image: <YOUR_DOCKER_IMAGE>
         env:
         - name: HDF5_USE_FILE_LOCKING
           value: 'FALSE'

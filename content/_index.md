@@ -6,9 +6,7 @@ weight: 1
 
 # Distributed Training Workshop
 
-Welcome to the distributed training workshop with TensorFlow on Amazon SageMaker and Amazon Elastic Kubernetes Service (EKS)
-
-
+### Welcome to the distributed training workshop with TensorFlow on Amazon SageMaker and Amazon Elastic Kubernetes Service (EKS)
 ### At the end of this workshop, you'll be able to:
 
 #### Identify when to consider distributed training
