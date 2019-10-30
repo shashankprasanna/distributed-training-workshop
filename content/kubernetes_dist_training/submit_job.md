@@ -3,20 +3,28 @@ title: "Submit distributed training job"
 date: 2019-10-28T17:14:05-07:00
 weight: 8
 ---
-
-Confirm that you are in the right directory
+#### Confirm that you are in the right directory
 ```
 cd ~/SageMaker/distributed-training-workshop/notebooks/part-3-kubernetes/
 ```
+#### Copy the container image name
 
-To submit a job run:
+![copy container](/images/eks/get_container.png?width=60pc)
+
+
+#### Update the MPIJob spec file
+
+Open `specs/eks_tf_training_job-cpu.yaml` and update `image: <YOUR_DOCKER_IMAGE>` with the name of your container.
+
+![update container](/images/eks/job_yaml_container.png?width=60pc)
+
+#### Submit a job run:
 ```
 kubectl apply -f specs/eks_tf_training_job-cpu.yaml
 ```
 {{% notice tip %}}
 For GPU jobs use this instead: `eks_tf_training_job-gpu.yaml`
 {{% /notice %}}
-
 
 You should see an output something like this:
 ```
