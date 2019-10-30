@@ -6,7 +6,7 @@
     <meta property="og:title" content="distributed-training-workshop.go-aws.com" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://distributed-training-workshop.go-aws.com" />
-    <meta property="og:image" content="https://master.d39z7jz3wszagx.amplifyapp.com/images/intro/parallel_distributed.png" />
+    <meta property="og:image" content="https://distributed-training-workshop.go-aws.com/images/intro/home.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     {{ .Hugo.Generator }}
     {{ partial "meta.html" . }}
@@ -77,7 +77,7 @@
                   <span id="toc-menu"><i class="fas fa-list-alt"></i></span>
                   {{ end }}
                   <span class="links">
-                    {{ template "breadcrumb" dict "page" . "value" .Title }}   
+                    {{ template "breadcrumb" dict "page" . "value" .Title }}
                   </span>
                 </div>
                 {{ if $toc }}
@@ -99,7 +99,7 @@
           {{$parent := .page.Parent }}
           {{ if $parent }}
             {{ $value := (printf "<a href='%s'>%s</a> > %s" $parent.URL $parent.Title .value) }}
-            {{ template "breadcrumb" dict "page" $parent "value" $value }} 
+            {{ template "breadcrumb" dict "page" $parent "value" $value }}
           {{else}}
             {{.value|safeHTML}}
           {{end}}
