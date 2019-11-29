@@ -18,6 +18,6 @@ git clone https://github.com/shashankprasanna/distributed-training-workshop.git
 ```
 
 * Confirm that you're able to see the contents. Should see 3 parts
-```
+```bash
 ls distributed-training-workshop/notebooks
 ```
